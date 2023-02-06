@@ -12,8 +12,6 @@
 #define ALERT_STATE 2
 
 
-
-
 int main(void){
 
 
@@ -33,8 +31,11 @@ int main(void){
 
     PM5CTL0 &= ~LOCKLPM5;                   // Disable the GPIO power-on default high-impedance mode
                                             // to activate previously configured port settings
+
+
     char Button = !(P4IN & BIT1);
     char state = ARMED_STATE;
+    double count = 0;
 
 
     while(1){
@@ -53,7 +54,7 @@ int main(void){
             {
                 P1OUT &= !BIT0;
                 P6OUT ^= BIT6;
-                __delay_cycles(150000000);
+                __delay_cycles(6000000);
             }
 
 
@@ -65,14 +66,37 @@ int main(void){
             {
                 state = 1;
                 P1OUT ^= BIT0;
+                count = count + 1;
+                if (count == 10)
+                    {
+                        state = 2;
+                    }
                 __delay_cycles(500000);
+                }
 
-            }
+
             if(!Button)
             {
                 state = 0;
             }
 
+
+        }
+        case 2:
+        {
+            if(Button)
+            {
+                state = 2;
+                P1OUT |= BIT0;
+                P6OUT ^= BIT6;
+                __delay_cycles(500000);
+            }
+            if(!Button)
+            {
+                state = 2;
+                P6OUT ^= BIT6;
+                __delay_cycles(500000);
+            }
         }
     }
 
