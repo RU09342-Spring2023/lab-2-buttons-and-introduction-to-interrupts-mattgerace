@@ -7,15 +7,21 @@
 
 #include <msp430.h>
 
-int main(void){
-
 #define ARMED_STATE 0
 #define WARNING_STATE 1
 #define ALERT_STATE 2
 
-char state = ARMED_STATE;
+
+
+
+int main(void){
+
+
+
 
     P6DIR |= BIT6;              // Configure P6.6 to an Output
+    P1DIR |= BIT0;
+
     P4DIR &= ~BIT1;             // Configure P4.1 to an Input
 
     P4REN |= BIT1;               // Enable Resistor on P4.1
@@ -27,32 +33,50 @@ char state = ARMED_STATE;
 
     PM5CTL0 &= ~LOCKLPM5;                   // Disable the GPIO power-on default high-impedance mode
                                             // to activate previously configured port settings
+    char Button = !(P4IN & BIT1);
+    char state = ARMED_STATE;
+
 
     while(1){
 
-    switch(state){
-        case ARMED_STATE:
+    switch(state)
+    {
+        case 0:
         {
-            if(P4IN & BIT1){
-              __bis_SR_register(LPM3_bits | GIE); // Enter LPM3 w/interrupt
-              __no_operation();                   // For debug
+            if(Button)
+            {
+                P6OUT &= ~BIT6;
+                state = 1;
             }
-            else
+
+            if(!Button)
+            {
+                P1OUT &= !BIT0;
                 P6OUT ^= BIT6;
-            __delay_cycles(100000);
+                __delay_cycles(150000000);
+            }
+
+
+        }
+
+        case 1:
+        {
+            if(Button)
+            {
+                state = 1;
+                P1OUT ^= BIT0;
+                __delay_cycles(500000);
+
+            }
+            if(!Button)
+            {
+                state = 0;
+            }
+
         }
     }
 
 
 
     }
-}
-
-
-#pragma vector=PORT4_VECTOR
-__interrupt void Port_4(void)
-{
-    P4IFG &= ~BIT1;                         // Clear P4.1 IFG
-    P4IES ^= BIT1;                          // Transition the Edge Type (Low --> High, or High --> Low)
-    __bic_SR_register_on_exit(LPM3_bits);   // Exit LPM3
 }
