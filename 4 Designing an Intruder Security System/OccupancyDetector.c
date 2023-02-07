@@ -1,13 +1,13 @@
 /*
  * OccupancyDetector.c
  *
- *  Created on: Jan 30, 2023
- *      Author: russty
+ *  Created on: Feb 3, 2023
+ *      Author: Matthew Gerace
  */
 
 #include <msp430.h>
 
-#define ARMED_STATE 0
+#define ARMED_STATE 0 //defining states that msp could possibly be in
 #define WARNING_STATE 1
 #define ALERT_STATE 2
 
@@ -33,9 +33,9 @@ int main(void){
                                             // to activate previously configured port settings
 
 
-    char Button = !(P4IN & BIT1);
-    char state = ARMED_STATE;
-    double count = 0;
+    char Button = !(P4IN & BIT1); //assigning char button to bitmask
+    char state = ARMED_STATE; //assigning designated state and default state to armed
+    int count = 0; //creating and int called count to track seconds
 
 
     while(1){
@@ -46,15 +46,17 @@ int main(void){
         {
             if(Button)
             {
-                P6OUT &= ~BIT6;
-                state = 1;
+                P6OUT &= ~BIT6; //turn P6.6 off
+                state = 1; //state change when button/movement is detected
             }
 
             if(!Button)
             {
-                P1OUT &= !BIT0;
-                P6OUT ^= BIT6;
-                __delay_cycles(6000000);
+                P1OUT &= !BIT0; //standard to turn off P1.0 LED
+                P6OUT ^= BIT6; //toggles P6.6 LED
+                __delay_cycles(500000); //waits 0.5 seconds
+                P6OUT ^= BIT6; //toggles P6.6 LED off
+                __delay_cycles(2500000); //waits 2.5 seconds
             }
 
 
@@ -64,42 +66,35 @@ int main(void){
         {
             if(Button)
             {
-                state = 1;
-
-                for(count=0; count < 11; count = count+1)
-                {
-                    P1OUT ^= BIT0;
-                 }
-                __delay_cycles(500000);
-
-                if(count == 10)
-                {
-                    state = 2;
-                }
+                state = 1; //keeps it in state 1
+                P1OUT ^= BIT0;  //toggles P1OUT
+                count = count + 1; //count up
+                if (count == 10) //if count reaches 10
+                    {
+                        state = 2; //state change to alert
+                    }
+                __delay_cycles(500000); //wait 0.5s
                 }
 
 
             if(!Button)
             {
-                state = 0;
+                state = 0;  //if movement stops being detected state 0
             }
 
 
         }
-        case 2:
+        case 2:         //case 0 and 1 work as expected, even count variable works as expected, had trouble transitioning into state 2 and keeping LED on
         {
             if(Button)
             {
-                state = 2;
-                P1OUT |= BIT0;
-                P6OUT ^= BIT6;
+                state = 2; //stay in alert
+                P1OUT |= BIT0; //turn P1 on constantly
                 __delay_cycles(500000);
             }
-            if(!Button)
+            if(!Button) //if button is released go back to armed
             {
-                state = 2;
-                P6OUT ^= BIT6;
-                __delay_cycles(500000);
+                state = 0;
             }
         }
     }
