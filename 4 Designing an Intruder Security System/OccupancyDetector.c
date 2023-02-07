@@ -65,13 +65,17 @@ int main(void){
             if(Button)
             {
                 state = 1;
-                P1OUT ^= BIT0;
-                count = count + 1;
-                if (count == 10)
-                    {
-                        state = 2;
-                    }
+
+                for(count=0; count < 11; count = count+1)
+                {
+                    P1OUT ^= BIT0;
+                 }
                 __delay_cycles(500000);
+
+                if(count == 10)
+                {
+                    state = 2;
+                }
                 }
 
 
