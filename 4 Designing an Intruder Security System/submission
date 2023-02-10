@@ -5,7 +5,6 @@ For an audience for your README, imagine you at the beginning of the lab, lookin
 
 The code is a occupancy detector code.  It works by assigning the LED outputs to outputs and assigning each button to an input configured with a pullup resistor.  
 After the initialization of all the inputs and outputs and pins are assigned, the code begins with an infinite while loop.  This while loop will run until infinity
-or until the code is terminated.  I designed two different versions of the code.  The while loop version is the top down version which essentially runs using dowhile loops
-to keep looping the code.  The other version of the code uses a switch statement in order to achieve the desire outcome in a state machine fashion.
-Both versions of the codes are efficient.  These codes both utilize an integer called "count" which is used for tracking the delay necessary in each state.
-The count variables counts up with the LED blinks and runs __delay_cycles(); in a loop in order to achieve the delay used for the warning and armed states.
+or until the code is terminated.  I designed two different versions of the code.  The while loop version is the top down version which essentially runs using if
+statements that rely on an arbitray variable count that tracks the current state of the detector.  It works using embedded if statements in order to simulate
+different states of the occupancy detector.
