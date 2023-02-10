@@ -1,0 +1,12 @@
+What is causing the bias/baseline in the polling example to be higher than the interrupt example.
+
+The baseline in the polling example is higher because it requires more power to constantly check and poll for possible changes.  It is constantly running
+in an attempt to view changes.  The interrupt works by causing a spike in power and only using that power when the interrupt is performed.
+
+
+Even with the LED unplugged, why is there still power increases when you press the button?
+
+The power is increased because it requires the processor to do a calculation and enter either the interrupt block or
+it enters the polling block.  This causes a spike in power regardless of if the LED is turned on or not.  In addition, the line that turns PxOUT to high still provides power.
+
+
